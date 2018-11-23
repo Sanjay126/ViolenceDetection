@@ -262,7 +262,7 @@ def __main__():
     parser.add_argument('--stepSize', type=int, default=25, help='Learning rate decay step')
     parser.add_argument('--decayRate', type=float, default=0.5, help='Learning rate decay rate')
     parser.add_argument('--seqLen', type=int, default=20, help='Length of sequence')
-    parser.add_argument('--trainBatchSize', type=int, default=6, help='Training batch size')
+    parser.add_argument('--trainBatchSize', type=int, default=8, help='Training batch size')
     parser.add_argument('--evalInterval', type=int, default=5, help='Evaluation interval')
     parser.add_argument('--evalMode', type=str, default='centerCrop', help='Evaluation mode', choices=['centerCrop', 'horFlip', 'fiveCrops', 'tenCrops'])
     parser.add_argument('--numWorkers', type=int, default=4, help='Number of workers for dataloader')
@@ -270,7 +270,7 @@ def __main__():
     parser.add_argument('--modelUsed', type=str, default='alexnet', help='Output directory')
     parser.add_argument('--pretrained', type=bool, default=True, help='Output directory')
     parser.add_argument('--minTrainEx', type=float, default=0.8, help='Output directory')
-    parser.add_argument('--datasetDir', type=str, default='/floyd/input/violencedataset', help='Output directory')
+    parser.add_argument('--datasetDir', type=str, default='./dataset', help='Output directory')
     args = parser.parse_args()
 
     numEpochs = args.numEpochs
