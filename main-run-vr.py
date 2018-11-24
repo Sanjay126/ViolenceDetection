@@ -75,16 +75,16 @@ def main_run(numEpochs, lr, stepSize, decayRate, trainBatchSize, seqLen,
 
     if evalMode == 'centerCrop':
         test_spatial_transform = Compose([Scale(256), CenterCrop(224), ToTensor(), normalize])
-        testBatchSize = 1
+        testBatchSize = trainBatchSize
     elif evalMode == 'tenCrops':
         test_spatial_transform = Compose([Scale(256), TenCrops(size=224, mean=mean, std=std)])
-        testBatchSize = 1
+        testBatchSize = trainBatchSize
     elif evalMode == 'fiveCrops':
         test_spatial_transform = Compose([Scale(256), FiveCrops(size=224, mean=mean, std=std)])
-        testBatchSize = 1
+        testBatchSize = trainBatchSize
     elif evalMode == 'horFlip':
         test_spatial_transform = Compose([Scale(256), CenterCrop(224), FlippedImagesTest(mean=mean, std=std)])
-        testBatchSize = 1
+        testBatchSize = trainBatchSize
 
     vidSeqTest = makeDataset(testDataset, testLabels, seqLen=seqLen,
     spatial_transform=test_spatial_transform)
@@ -100,7 +100,7 @@ def main_run(numEpochs, lr, stepSize, decayRate, trainBatchSize, seqLen,
     print('Number of training samples = {}'.format(numTrainInstances))
     print('Number of testing samples = {}'.format(numTestInstances))
 
-    modelFolder = './experiments_' + outDir+'_'+modelUsed # Dir for saving models and log files
+    modelFolder = './experiments_' + outDir+'_'+modelUsed+'_'+str(pretrained) # Dir for saving models and log files
     # Create the dir
     if os.path.exists(modelFolder):
         print(modelFolder + ' exists!!!')
@@ -261,16 +261,16 @@ def __main__():
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
     parser.add_argument('--stepSize', type=int, default=25, help='Learning rate decay step')
     parser.add_argument('--decayRate', type=float, default=0.5, help='Learning rate decay rate')
-    parser.add_argument('--seqLen', type=int, default=20, help='Length of sequence')
-    parser.add_argument('--trainBatchSize', type=int, default=8, help='Training batch size')
+    parser.add_argument('--seqLen', type=int, default=25, help='Length of sequence')
+    parser.add_argument('--trainBatchSize', type=int, default=12, help='Training batch size')
     parser.add_argument('--evalInterval', type=int, default=5, help='Evaluation interval')
-    parser.add_argument('--evalMode', type=str, default='centerCrop', help='Evaluation mode', choices=['centerCrop', 'horFlip', 'fiveCrops', 'tenCrops'])
-    parser.add_argument('--numWorkers', type=int, default=4, help='Number of workers for dataloader')
+    parser.add_argument('--evalMode', type=str, default='horFlip', help='Evaluation mode', choices=['centerCrop', 'horFlip', 'fiveCrops', 'tenCrops'])
+    parser.add_argument('--numWorkers', type=int, default=10, help='Number of workers for dataloader')
     parser.add_argument('--outDir', type=str, default='violence', help='Output directory')
     parser.add_argument('--modelUsed', type=str, default='alexnet', help='Output directory')
     parser.add_argument('--pretrained', type=bool, default=True, help='Output directory')
     parser.add_argument('--minTrainEx', type=float, default=0.8, help='Output directory')
-    parser.add_argument('--datasetDir', type=str, default='./dataset', help='Output directory')
+    parser.add_argument('--datasetDir', type=str, default='./google_colab/dataset', help='Output directory')
     args = parser.parse_args()
 
     numEpochs = args.numEpochs

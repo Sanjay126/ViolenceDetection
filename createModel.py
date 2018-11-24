@@ -24,12 +24,12 @@ class ViolenceModel(nn.Module):
                 self.mod=models.vgg19(pretrained=pretrained)
                 self.convNet = nn.Sequential(*(list(self.mod.children()))[:-1])
                 self.mem_size=384
-                self.conv_lstm = ConvLSTMCell(384, self.mem_size)
+                self.conv_lstm = ConvLSTMCell(512, self.mem_size)
         elif modelused=='resnet18':
                 self.mod=models.resnet18(pretrained=pretrained)
                 self.convNet = nn.Sequential(*(list(self.mod.children()))[:-2])
-                self.mem_size=768
-                self.conv_lstm = ConvLSTMCell(768, self.mem_size)
+                self.mem_size=640
+                self.conv_lstm = ConvLSTMCell(640, self.mem_size)
 
         elif modelused=='resnet101':
                 self.mod=models.resnet101(pretrained=pretrained)
