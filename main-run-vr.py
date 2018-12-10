@@ -113,10 +113,11 @@ def kFoldCrossValid(folds,data,label,Epochs,evalMode,numWorkers,lr, stepSize, de
             for i in test_index:
                 testDataset.append(data[i])
                 testLabels.append(label[i])
-            _,accuracy=modelTrain(models[j],True,trainDataset,trainLabels,testDataset,testLabels,Epochs,Epochs,evalMode,'/crossvalid',numWorkers,lr, stepSize, decayRate, trainBatchSize, seqLen)
+            _,accuracy=modelTrain(models[j],True,trainDataset,trainLabels,testDataset,testLabels,Epochs,Epochs,evalMode,'/crossvalid',numWorkers,lr, stepSize, decayRate, trainBatchSize, seqLen,False)
             accuracyList[j]+=accuracy
         accuracyList[j]/=kf.get_n_splits()
     plot_bar_x(models,accuracyList)
+    sys.exit()
 
 def plot_bar_x(models,accuracyList):
     # this is for plotting bar graph 
@@ -128,7 +129,7 @@ def plot_bar_x(models,accuracyList):
     plt.title('K-fold  cross validation results')
     plt.savefig('./crossvalidation.png')
 
-def modelTrain(modelUsed,pretrained,trainDataset,trainLabels,validationDataset,validationLabels,numEpochs,evalInterval,evalMode,outDir,numWorkers,lr, stepSize, decayRate, trainBatchSize, seqLen):
+def modelTrain(modelUsed,pretrained,trainDataset,trainLabels,validationDataset,validationLabels,numEpochs,evalInterval,evalMode,outDir,numWorkers,lr, stepSize, decayRate, trainBatchSize, seqLen,plotting):
     mean=[0.485, 0.456, 0.406]
     std=[0.229, 0.224, 0.225]
     normalize = Normalize(mean=mean, std=std)
@@ -282,35 +283,36 @@ def modelTrain(modelUsed,pretrained,trainDataset,trainLabels,validationDataset,v
                 bestmodel=model
                 minAccuracy = validationAccuracy
     '''plotting the accuracy and loss curves'''
-    xc=range(1,numEpochs+1)
-    xv=[]
-    for i in xc:
-        if(i%evalInterval==0):
-            xv.append(i)
-    plt.figure(1,figsize=(7,5))
-    plt.plot(xc,train_loss)
-    plt.plot(xv,val_loss)
-    plt.xlabel('num of Epochs')
-    plt.ylabel('loss')
-    plt.title('train_loss vs val_loss')
-    plt.grid(True)
-    plt.legend(['train','val'])
-    #print plt.style.available # use bmh, classic,ggplot for big pictures
-    plt.style.use(['classic'])
-    plt.savefig(modelFolder+"/lossCurve.png")
+    if plotting:
+        xc=range(1,numEpochs+1)
+        xv=[]
+        for i in xc:
+            if(i%evalInterval==0):
+                xv.append(i)
+        plt.figure(1,figsize=(7,5))
+        plt.plot(xc,train_loss)
+        plt.plot(xv,val_loss)
+        plt.xlabel('num of Epochs')
+        plt.ylabel('loss')
+        plt.title('train_loss vs val_loss')
+        plt.grid(True)
+        plt.legend(['train','val'])
+        #print plt.style.available # use bmh, classic,ggplot for big pictures
+        plt.style.use(['classic'])
+        plt.savefig(modelFolder+"/lossCurve.png")
 
-    plt.figure(2,figsize=(7,5))
-    plt.plot(xc,train_acc)
-    plt.plot(xv,val_acc)
-    plt.xlabel('num of Epochs')
-    plt.ylabel('accuracy')
-    plt.title('train_acc vs val_acc')
-    plt.grid(True)
-    plt.legend(['train','val'],loc=4)
-    #print plt.style.available # use bmh, classic,ggplot for big pictures
-    plt.style.use(['classic'])
-    plt.savefig(modelFolder+"/accuracyCurve.png")
-    #plt.show()
+        plt.figure(2,figsize=(7,5))
+        plt.plot(xc,train_acc)
+        plt.plot(xv,val_acc)
+        plt.xlabel('num of Epochs')
+        plt.ylabel('accuracy')
+        plt.title('train_acc vs val_acc')
+        plt.grid(True)
+        plt.legend(['train','val'],loc=4)
+        #print plt.style.available # use bmh, classic,ggplot for big pictures
+        plt.style.use(['classic'])
+        plt.savefig(modelFolder+"/accuracyCurve.png")
+        #plt.show()
     trainLogAcc.close()
     validationLogAcc.close()
     trainLogLoss.close()
@@ -333,7 +335,7 @@ def main_run(numEpochs, lr, stepSize, decayRate, trainBatchSize, seqLen,
 
     else:
         (trainDataset,trainLabels),(validationDataset,validationLabels),(testDataset,testLabels)=sampleFromClass(compDataset,classCount,train_test_split)
-        model,accuracy=modelTrain(modelUsed,pretrained,trainDataset,trainLabels,validationDataset,validationLabels,numEpochs,evalInterval,evalMode,outDir,numWorkers,lr, stepSize, decayRate, trainBatchSize, seqLen)
+        model,accuracy=modelTrain(modelUsed,pretrained,trainDataset,trainLabels,validationDataset,validationLabels,numEpochs,evalInterval,evalMode,outDir,numWorkers,lr, stepSize, decayRate, trainBatchSize, seqLen,True)
         '''for printing confusion matrix'''
         mean=[0.485, 0.456, 0.406]
         std=[0.229, 0.224, 0.225]
@@ -419,7 +421,7 @@ def main_run(numEpochs, lr, stepSize, decayRate, trainBatchSize, seqLen,
 
 def __main__():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--numEpochs', type=int, default=10, help='Number of epochs')
+    parser.add_argument('--numEpochs', type=int, default=1, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
     parser.add_argument('--stepSize', type=int, default=25, help='Learning rate decay step')
     parser.add_argument('--decayRate', type=float, default=0.05, help='Learning rate decay rate')

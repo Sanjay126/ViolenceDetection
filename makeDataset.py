@@ -32,5 +32,8 @@ class makeDataset(Dataset):
             index+=1
             img=Image.fromarray(frame)
             inpSeq.append(self.spatial_transform(img.convert('RGB')))
+        for i in range(3):
+            k=inpSeq[0]-inpSeq[1]
+            k.save("./diff"+self.images[idx]+str(i),".png")
         inpSeq = torch.stack(inpSeq, 0)
         return inpSeq, label
